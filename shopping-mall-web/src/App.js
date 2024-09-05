@@ -1,17 +1,15 @@
-// src/Routes.js or src/App.js
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Dashboard from './components/Dashboard';
-import './index.css';
+import React from 'react';
+import Dashboard from './pages/Dashboard';
+import { AppProvider } from './context/AppContext';
 
-function App() {
+const App = () => {
   return (
-    <Router>
-      <Routes>
-        {/* Other routes */}
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </Router>
+    <AppProvider>
+      <div className="App">
+        <Dashboard />
+      </div>
+    </AppProvider>
   );
-}
+};
 
 export default App;
