@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import NavBar from '../components/layout/NavBar';
 import DashboardContent from '../components/dashboard/DashboardContent';
 import PromotionsContent from '../components/promotions/PromotionsContent';
@@ -43,11 +43,15 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <NavBar activeTab={activeTab} setActiveTab={setActiveTab} isMobile={isMobile} />
-      <div className="pt-16">
+      
+      {/* Added container class for margins */}
+      <div className="container mx-auto pt-16">
         {activeTab === 'dashboard' && <DashboardContent setIsPromotionFormOpen={setIsPromotionFormOpen} setIsEventFormOpen={setIsEventFormOpen} />}
         {activeTab === 'promotions' && <PromotionsContent promotions={promotions} handleEditPromotion={handleEditPromotion} handleDeletePromotion={handleDeletePromotion} setIsPromotionFormOpen={setIsPromotionFormOpen} />}
         {activeTab === 'events' && <EventsContent events={events} handleEditEvent={handleEditEvent} handleDeleteEvent={handleDeleteEvent} setIsEventFormOpen={setIsEventFormOpen} />}
       </div>
+
+      {/* Promotion and Event Forms */}
       <PromotionForm
         isOpen={isPromotionFormOpen}
         onClose={() => {
