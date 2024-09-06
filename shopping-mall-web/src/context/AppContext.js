@@ -1,25 +1,45 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 const AppContext = createContext();
 
-export const AppProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [theme, setTheme] = useState('light');
+export const useAppContext = () => useContext(AppContext);
 
-  const value = {
-    user,
-    setUser,
-    theme,
-    setTheme,
+export const AppProvider = ({ children }) => {
+  const [promotions, setPromotions] = useState([]);
+  const [events, setEvents] = useState([]);
+
+  // Promotions management
+  const addPromotion = (newPromotion) => {
+    setPromotions([...promotions, { ...newPromotion, id: Date.now() }]);
   };
 
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
-};
+  const updatePromotion = (updatedPromotion) => {
+    setPromotions(promotions.map(p => p.id === updatedPromotion.id ? updatedPromotion : p));
+  };
 
-export const useApp = () => {
-  const context = useContext(AppContext);
-  if (context === undefined) {
-    throw new Error('useApp must be used within an AppProvider');
-  }
-  return context;
+  const deletePromotion = (id) => {
+    setPromotions(promotions.filter(p => p.id !== id));
+  };
+
+  // Events management
+  const addEvent = (newEvent) => {
+    setEvents([...events, { ...newEvent, id: Date.now() }]);
+  };
+
+  const updateEvent = (updatedEvent) => {
+    setEvents(events.map(e => e.id === updatedEvent.id ? updatedEvent : e));
+  };
+
+  const deleteEvent = (id) => {
+    setEvents(events.filter(e => e.id !== id));
+  };
+
+  return (
+    <AppContext.Provider value={{ 
+      promotions, addPromotion, updatePromotion, deletePromotion,
+      events, addEvent, updateEvent, deleteEvent
+    }}>
+      {children}
+    </AppContext.Provider>
+  );
 };
