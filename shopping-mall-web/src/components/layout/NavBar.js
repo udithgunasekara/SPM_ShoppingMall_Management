@@ -32,14 +32,14 @@ const NavBar = ({ isMobile }) => {
                   <Link to="/events" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/events' ? 'bg-gray-900 text-white' : ''}`}>
                     <FiCalendar className="mr-2" />
                     Events
-                  </Link>
-                  <Link to="/reports" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/reports' ? 'bg-gray-900 text-white' : ''}`}>
-                    <FiBarChart2 className="mr-2" />
-                    Reports
-                  </Link>
+                  </Link>                  
                   <Link to="/users" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/users' ? 'bg-gray-900 text-white' : ''}`}>
                     <FiUsers className="mr-2" />
                     User Management
+                  </Link>
+                  <Link to="/giftcard" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/giftcard' ? 'bg-gray-900 text-white' : ''}`}>
+                    <FiUsers className="mr-2" />
+                    Gift card
                   </Link>
                 </div>
               </div>

@@ -6,6 +6,7 @@ import Promotions from './pages/Promotions';
 import Events from './pages/Events';
 import { AppProvider } from './context/AppContext';
 import useWindowSize from './hooks/useWindowSize';
+import Giftcard from './pages/Giftcard';
 
 const App = () => {
   const { isMobile } = useWindowSize();
@@ -20,6 +21,7 @@ const App = () => {
               <Route path="/" element={<Dashboard />} />
               <Route path="/promotions" element={<Promotions />} />
               <Route path="/events" element={<Events />} />
+              <Route path="/giftcard" element={<Giftcard/>} />
             </Routes>
           </div>
         </div>
