@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { FiMenu, FiSearch, FiBell, FiBarChart2, FiPlus, FiCalendar, FiUsers } from 'react-icons/fi';
-import NavLink from '../common/NavLink';
 
-const NavBar = ({ activeTab, setActiveTab, isMobile }) => {
+const NavBar = ({ isMobile }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setIsMenuOpen(false);
   };
 
   return (
@@ -25,11 +21,26 @@ const NavBar = ({ activeTab, setActiveTab, isMobile }) => {
             {!isMobile && (
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">
-                  <NavLink icon={<FiBarChart2 className="mr-2" />} text="Dashboard" tab="dashboard" activeTab={activeTab} onClick={() => handleTabChange('dashboard')} />
-                  <NavLink icon={<FiPlus className="mr-2" />} text="Promotions" tab="promotions" activeTab={activeTab} onClick={() => handleTabChange('promotions')} />
-                  <NavLink icon={<FiCalendar className="mr-2" />} text="Events" tab="events" activeTab={activeTab} onClick={() => handleTabChange('events')} />
-                  <NavLink icon={<FiBarChart2 className="mr-2" />} text="Reports" tab="reports" activeTab={activeTab} onClick={() => handleTabChange('reports')} />
-                  <NavLink icon={<FiUsers className="mr-2" />} text="User Management" tab="users" activeTab={activeTab} onClick={() => handleTabChange('users')} />
+                  <Link to="/" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/' ? 'bg-gray-900 text-white' : ''}`}>
+                    <FiBarChart2 className="mr-2" />
+                    Dashboard
+                  </Link>
+                  <Link to="/promotions" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/promotions' ? 'bg-gray-900 text-white' : ''}`}>
+                    <FiPlus className="mr-2" />
+                    Promotions
+                  </Link>
+                  <Link to="/events" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/events' ? 'bg-gray-900 text-white' : ''}`}>
+                    <FiCalendar className="mr-2" />
+                    Events
+                  </Link>
+                  <Link to="/reports" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/reports' ? 'bg-gray-900 text-white' : ''}`}>
+                    <FiBarChart2 className="mr-2" />
+                    Reports
+                  </Link>
+                  <Link to="/users" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/users' ? 'bg-gray-900 text-white' : ''}`}>
+                    <FiUsers className="mr-2" />
+                    User Management
+                  </Link>
                 </div>
               </div>
             )}
@@ -69,11 +80,26 @@ const NavBar = ({ activeTab, setActiveTab, isMobile }) => {
       {isMobile && isMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <NavLink icon={<FiBarChart2 className="mr-2" />} text="Dashboard" tab="dashboard" activeTab={activeTab} onClick={() => handleTabChange('dashboard')} />
-            <NavLink icon={<FiPlus className="mr-2" />} text="Promotions" tab="promotions" activeTab={activeTab} onClick={() => handleTabChange('promotions')} />
-            <NavLink icon={<FiCalendar className="mr-2" />} text="Events" tab="events" activeTab={activeTab} onClick={() => handleTabChange('events')} />
-            <NavLink icon={<FiBarChart2 className="mr-2" />} text="Reports" tab="reports" activeTab={activeTab} onClick={() => handleTabChange('reports')} />
-            <NavLink icon={<FiUsers className="mr-2" />} text="User Management" tab="users" activeTab={activeTab} onClick={() => handleTabChange('users')} />
+            <Link to="/" className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === '/' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}>
+              <FiBarChart2 className="mr-2" />
+              Dashboard
+            </Link>
+            <Link to="/promotions" className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === '/promotions' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}>
+              <FiPlus className="mr-2" />
+              Promotions
+            </Link>
+            <Link to="/events" className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === '/events' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}>
+              <FiCalendar className="mr-2" />
+              Events
+            </Link>
+            <Link to="/reports" className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === '/reports' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}>
+              <FiBarChart2 className="mr-2" />
+              Reports
+            </Link>
+            <Link to="/users" className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === '/users' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}>
+              <FiUsers className="mr-2" />
+              User Management
+            </Link>
           </div>
         </div>
       )}
