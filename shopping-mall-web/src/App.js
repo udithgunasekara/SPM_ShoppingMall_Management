@@ -6,8 +6,7 @@ import Promotions from "./pages/Promotions";
 import Events from "./pages/Events";
 import { AppProvider } from "./context/AppContext";
 import useWindowSize from "./hooks/useWindowSize";
-import Addproduct from "./components/Product/Addproduct";
-import ProductsList from "./components/Product/ProductsList";
+import Giftcard from "./pages/Giftcard";
 
 const App = () => {
   const { isMobile } = useWindowSize();
@@ -22,11 +21,7 @@ const App = () => {
               <Route path="/" element={<Dashboard />} />
               <Route path="/promotions" element={<Promotions />} />
               <Route path="/events" element={<Events />} />
-
-              {/* Udith */}
-              <Route path="/update-product/:id" element={<Addproduct />} />
-              <Route path="/add" element={<Addproduct />} />
-              <Route path="/productList" element={<ProductsList />} />
+              <Route path="/giftcard" element={<Giftcard />} />
             </Routes>
           </div>
         </div>
