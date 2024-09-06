@@ -17,20 +17,21 @@ const GiftcardForm = ({
     validity: "",
   });
   useEffect(() => {
-    if (editingGiftcard) {
-
-        const giftcardData = {
-            ...editingGiftcard,
-            validity: editingGiftcard.validity
-              ? new Date(editingGiftcard.validity.seconds * 1000).toISOString().split('T')[0]  // Convert Timestamp to YYYY-MM-DD
-              : "",  // Default to empty if no validity
-          };
-
-      setFormData(giftcardData);
-    } else {
-      setFormData({ store: "", price: "", validity: "" });
+    if(isOpen){
+        if (editingGiftcard) {
+            const giftcardData = {
+                ...editingGiftcard,
+                validity: editingGiftcard.validity
+                  ? new Date(editingGiftcard.validity.seconds * 1000).toISOString().split('T')[0]  // Convert Timestamp to YYYY-MM-DD
+                  : "",  // Default to empty if no validity
+              };
+    
+          setFormData(giftcardData);
+        } else {
+          setFormData({ store: "", price: "", validity: "" });
+        }
     }
-  }, [editingGiftcard]);
+  }, [editingGiftcard,isOpen]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
