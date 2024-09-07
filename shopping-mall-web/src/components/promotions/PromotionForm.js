@@ -1,38 +1,56 @@
 import React, { useState, useEffect } from 'react';
+import { useAppContext } from '../../context/AppContext';
 
-const PromotionForm = ({ isOpen, onClose, editingPromotion, setPromotions, promotions }) => {
+const PromotionForm = ({ isOpen, onClose, editingPromotion }) => {
+  const { addPromotion, updatePromotion } = useAppContext();
   const [formData, setFormData] = useState({
     name: '',
     discount: '',
     duration: '',
-    bannerImage: null,
+    bannerImage: null,  // Initialize with null
   });
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     if (editingPromotion) {
-      setFormData(editingPromotion);
+      setFormData({
+        ...editingPromotion,
+      });
+      if (editingPromotion.bannerImage && typeof editingPromotion.bannerImage === 'string') {
+        // Set the image URL directly if it's a string (existing image URL)
+        setImagePreview(editingPromotion.bannerImage);
+      } else {
+        setImagePreview(null);
+      }
     } else {
       setFormData({ name: '', discount: '', duration: '', bannerImage: null });
+      setImagePreview(null);
     }
   }, [editingPromotion]);
 
   const handleChange = (e) => {
-    if (e.target.name === 'bannerImage') {
-      setFormData({ ...formData, bannerImage: e.target.files[0] });
+    const { name, value, files } = e.target;
+    if (name === 'bannerImage' && files && files[0]) {
+      const file = files[0];
+      setFormData({ ...formData, [name]: file });
+      setImagePreview(URL.createObjectURL(file));  // Create a URL for the image preview
     } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
+      setFormData({ ...formData, [name]: value });
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const promotionData = {
+      ...formData,
+      bannerImage: formData.bannerImage instanceof File ? formData.bannerImage : null, // Ensure bannerImage is a File or null
+    };
+
     if (editingPromotion) {
-      const updatedPromotions = promotions.map(p =>
-        p.id === editingPromotion.id ? { ...p, ...formData } : p
-      );
-      setPromotions(updatedPromotions);
+      await updatePromotion({ ...editingPromotion, ...promotionData });
     } else {
-      setPromotions([...promotions, { ...formData, id: Date.now() }]);
+      await addPromotion(promotionData);
     }
     onClose();
   };
@@ -105,9 +123,9 @@ const PromotionForm = ({ isOpen, onClose, editingPromotion, setPromotions, promo
               className="block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               required={editingPromotion ? false : true}
             />
-            {formData.bannerImage && (
+            {imagePreview && (
               <div className="mt-2">
-                <img src={URL.createObjectURL(formData.bannerImage)} alt="Banner Preview" className="max-w-full h-auto mx-auto" />
+                <img src={imagePreview} alt="Banner Preview" className="max-w-full h-auto mx-auto" />
               </div>
             )}
           </div>
