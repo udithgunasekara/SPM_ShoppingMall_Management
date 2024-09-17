@@ -1,89 +1,89 @@
-import React, { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../config/firebaseConfig";
-import ReadGiftcard from "./ReadGiftcard";
-import { doc, updateDoc, addDoc,Timestamp } from "firebase/firestore";
+import { useState, useEffect } from "react";
+import { Timestamp } from "firebase/firestore";
+import { useGiftcardContext } from "../../context/GiftcardContext";
 
 const GiftcardForm = ({
   isOpen,
   onClose,
   editingGiftcard,
-  setGiftcards,
-  giftcards,
 }) => {
   const [formData, setFormData] = useState({
     store: "",
     price: "",
     validity: "",
   });
+
+  const { giftCard,updateGiftCard,createGiftCard } = useGiftcardContext();
+
   useEffect(() => {
-    if(isOpen){
-        if (editingGiftcard) {
-            const giftcardData = {
-                ...editingGiftcard,
-                validity: editingGiftcard.validity
-                  ? new Date(editingGiftcard.validity.seconds * 1000).toISOString().split('T')[0]  // Convert Timestamp to YYYY-MM-DD
-                  : "",  // Default to empty if no validity
-              };
-    
-          setFormData(giftcardData);
-        } else {
-          setFormData({ store: "", price: "", validity: "" });
-        }
+    if (isOpen) {
+      if (editingGiftcard) {
+        const giftcardData = {
+          ...editingGiftcard,
+          validity: editingGiftcard.validity
+            ? new Date(editingGiftcard.validity.seconds * 1000)
+                .toISOString()
+                .split("T")[0] // Convert Timestamp to YYYY-MM-DD
+            : "", // Default to empty if no validity
+        };
+
+        setFormData(giftcardData);
+      } else {
+        setFormData({ store: "", price: "", validity: "" });
+      }
     }
-  }, [editingGiftcard,isOpen]);
+  }, [editingGiftcard, isOpen]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    setFormData({ ...formData, [e.target.name]: e.target.value });
     console.log(e.target.value);
-    
-    
   };
 
-  const formatdateToTimestamp = (e) => {
-    const date = new Date(e.target.value);
-    if (!isNaN(date)) {
-      // Convert the date to a Firestore Timestamp
-      setFormData({ ...formData, validity: Timestamp.fromDate(date) });
-    } else {
-      console.error("Invalid date");
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Parse the date string from the form data into a valid Date object
+      const validityDate = new Date(formData.validity);
+      console.log(validityDate);
 
-    // Parse the date string from the form data into a valid Date object
-    const validityDate = new Date(formData.validity);
-    console.log(validityDate);
-
-    // Check if the date is valid
-    if (isNaN(validityDate.getTime())) {
-      throw new Error("Invalid date format");
-    }
-    // Convert the date to Firestore Timestamp
-    const timestamp = Timestamp.fromDate(validityDate);
+      // Check if the date is valid
+      if (isNaN(validityDate.getTime())) {
+        throw new Error("Invalid date format");
+      }
+      // Convert the date to Firestore Timestamp
+      const timestamp = Timestamp.fromDate(validityDate);
 
       if (editingGiftcard) {
-        const giftcardDocRef = doc(db, "giftcard", editingGiftcard.id);
-        await updateDoc(giftcardDocRef, {
-            ...formData,validity:timestamp,
+        await updateGiftCard(editingGiftcard.id, {
+          ...formData,
+          validity: timestamp,
         });
 
-        const updatedGiftcards = giftcards.map((p) =>
-          p.id === editingGiftcard.id ? { ...p, ...formData,validity:timestamp } : p
+        const updatedGiftcards = giftCard.map((p) =>
+          p.id === editingGiftcard.id
+            ? { ...p, ...formData, validity: timestamp }
+            : p
         );
-        setGiftcards(updatedGiftcards);
+        // setGiftcards(updatedGiftcards);
         // setFormData(updatedGiftcards);
       } else {
-        const docRef = await addDoc(collection(db, "giftcard"), {
-        store: formData.store,
-        price: formData.price,
-        validity: timestamp        
-        });
-        
-        setGiftcards([...giftcards, {...formData,id:docRef.id,validity:timestamp} ]);
+        /* const docRef = await addDoc(collection(db, "giftcard"), {
+          store: formData.store,
+          price: formData.price,
+          validity: timestamp,
+        }); */
+
+        await createGiftCard({
+          store: formData.store,
+          price: formData.price,
+          validity: timestamp,
+        })
+
+        /* setGiftcards([
+          ...giftcards,
+          { ...formData, id: docRef.id, validity: timestamp },
+        ]); */
       }
 
       onClose();
@@ -160,10 +160,7 @@ const GiftcardForm = ({
             <input
               type="date"
               name="validity"
-              value={
-                formData.validity
-                  
-              }
+              value={formData.validity}
               onChange={handleChange}
               placeholder="Enter last valid date"
               aria-label="Valid date"
