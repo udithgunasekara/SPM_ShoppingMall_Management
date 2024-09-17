@@ -21,23 +21,23 @@ const NavBar = ({ isMobile }) => {
             {!isMobile && (
               <div className="hidden md:block">
                 <div className="ml-10 flex items-baseline space-x-4">
-                  <Link to="/" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/' ? 'bg-gray-900 text-white' : ''}`}>
+                  <Link to="/" className={`text-gray-500 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/' ? 'bg-gray-900 text-white' : ''}`}>
                     <FiBarChart2 className="mr-2" />
                     Dashboard
                   </Link>
-                  <Link to="/promotions" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/promotions' ? 'bg-gray-900 text-white' : ''}`}>
+                  <Link to="/promotions" className={`text-gray-500 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/promotions' ? 'bg-gray-900 text-white' : ''}`}>
                     <FiPlus className="mr-2" />
                     Promotions
                   </Link>
-                  <Link to="/events" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/events' ? 'bg-gray-900 text-white' : ''}`}>
+                  <Link to="/events" className={`text-gray-500 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/events' ? 'bg-gray-900 text-white' : ''}`}>
                     <FiCalendar className="mr-2" />
                     Events
                   </Link>                  
-                  <Link to="/users" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/users' ? 'bg-gray-900 text-white' : ''}`}>
+                  <Link to="/users" className={`text-gray-500 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/users' ? 'bg-gray-900 text-white' : ''}`}>
                     <FiUsers className="mr-2" />
                     User Management
                   </Link>
-                  <Link to="/giftcard" className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/giftcard' ? 'bg-gray-900 text-white' : ''}`}>
+                  <Link to="/giftcard" className={`text-gray-500 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${location.pathname === '/giftcard' ? 'bg-gray-900 text-white' : ''}`}>
                     <FiUsers className="mr-2" />
                     Gift card
                   </Link>
