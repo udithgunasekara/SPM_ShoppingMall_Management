@@ -5,9 +5,10 @@ import Barcode from "react-barcode"; // Import the barcode component
 
 const ProductsList = () => {
   const [products, setProducts] = useState([]);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0); // State for the current image index
-  const [selectedProductImages, setSelectedProductImages] = useState([]); // State for the selected product images
-  const barcodeRefs = useRef({});
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedProductImages, setSelectedProductImages] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const barcodeRefs = useRef({}); // Create a ref object to hold barcode refs
   const db = getFirestore();
   const navigate = useNavigate();
 
@@ -34,13 +35,13 @@ const ProductsList = () => {
   };
 
   const handlePreviewImage = (images, index) => {
-    setSelectedProductImages(images); // Set the selected product's images
-    setSelectedImageIndex(index); // Set the index of the clicked image
+    setSelectedProductImages(images);
+    setSelectedImageIndex(index);
   };
 
   const handleCloseModal = () => {
-    setSelectedProductImages([]); // Close the modal by resetting the images
-    setSelectedImageIndex(0); // Reset the index
+    setSelectedProductImages([]);
+    setSelectedImageIndex(0);
   };
 
   const showNextImage = () => {
@@ -56,13 +57,15 @@ const ProductsList = () => {
   };
 
   const handleDownloadBarcode = (id, title) => {
+    if (!barcodeRefs.current[id]) {
+      console.error(`Barcode ref for id ${id} is not defined`);
+      return;
+    }
+
     const svgElement = barcodeRefs.current[id].querySelector("svg"); // Get the SVG element from the Barcode component
     if (svgElement) {
-      // Create a canvas element
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-
-      // Create an image from the SVG
       const svgData = new XMLSerializer().serializeToString(svgElement);
       const img = new Image();
       const svgBlob = new Blob([svgData], {
@@ -71,35 +74,49 @@ const ProductsList = () => {
       const url = URL.createObjectURL(svgBlob);
 
       img.onload = () => {
-        // Set canvas dimensions
-        canvas.width = img.width;
-        canvas.height = img.height;
-
-        // Draw the SVG image on the canvas
-        ctx.drawImage(img, 0, 0);
-
-        // Convert canvas to PNG
+        const scaleFactor = 2; // Adjust this value to resize the image
+        canvas.width = img.width * scaleFactor;
+        canvas.height = img.height * scaleFactor;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         const pngUrl = canvas.toDataURL("image/png");
 
-        // Create a download link
         const link = document.createElement("a");
         link.href = pngUrl;
         link.download = `${title}-barcode.png`;
         link.click();
 
-        // Clean up URL object
         URL.revokeObjectURL(url);
       };
 
-      // Set the image source to the SVG blob URL
       img.src = url;
     }
   };
+
+  // Filter products based on search term
+  const filteredProducts = products.filter(
+    (product) =>
+      product.title &&
+      product.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="p-6">
       <h2 className="text-3xl font-bold mb-6">Product List</h2>
       <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="flex justify-between items-center mb-6 space-x-4">
+          <input
+            type="text"
+            placeholder="Search Product..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out"
+          />
+          <button
+            onClick={() => navigate("/add")}
+            className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition duration-300">
+            Add New Product
+          </button>
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -128,7 +145,7 @@ const ProductsList = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <tr
                   key={product.id}
                   className="hover:bg-gray-50 transition duration-200 ease-in-out">
@@ -154,13 +171,15 @@ const ProductsList = () => {
                           className="h-16 w-16 object-cover rounded-lg cursor-pointer"
                           onClick={() =>
                             handlePreviewImage(product.images, index)
-                          } // Open image preview on click
+                          }
                         />
                       ))}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <div className="w-60 h-20">
+                    <div
+                      className="w-60 h-20"
+                      ref={(el) => (barcodeRefs.current[product.id] = el)}>
                       <Barcode
                         value={product.id}
                         width={0.7}
@@ -181,7 +200,7 @@ const ProductsList = () => {
                     <button
                       onClick={() =>
                         handleDownloadBarcode(product.id, product.title)
-                      } // Handle barcode download
+                      }
                       className="text-green-600 hover:text-green-800 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 hover:bg-green-200 transition duration-300">
                       Bar Download
                     </button>
@@ -199,26 +218,26 @@ const ProductsList = () => {
           <div className="bg-white p-4 rounded-lg shadow-lg max-w-lg w-full">
             <img
               src={selectedProductImages[selectedImageIndex]}
-              alt={`Product Image ${selectedImageIndex + 1}`}
-              className="max-w-full h-auto mx-auto"
+              alt="Preview"
+              className="w-full h-64 object-cover rounded-lg mb-4"
             />
-            <div className="flex justify-between mt-4">
+            <div className="flex justify-between">
               <button
                 onClick={showPreviousImage}
-                className="text-gray-600 hover:text-gray-800 px-10 py-2 rounded-full text-xs font-semibold bg-gray-200 hover:bg-gray-200 transition duration-300">
+                className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded">
                 Previous
               </button>
               <button
                 onClick={showNextImage}
-                className="text-gray-600 hover:text-gray-800 px-10 py-2 rounded-full text-xs font-semibold bg-gray-200 hover:bg-gray-200 transition duration-300">
+                className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded">
                 Next
               </button>
+              <button
+                onClick={handleCloseModal}
+                className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 rounded">
+                Close
+              </button>
             </div>
-            <button
-              onClick={handleCloseModal}
-              className="mt-5 text-red-100 hover:text-red-800 px-10 py-2 rounded-full text-xs font-semibold bg-red-800 hover:bg-red-200 transition duration-300">
-              Close
-            </button>
           </div>
         </div>
       )}
