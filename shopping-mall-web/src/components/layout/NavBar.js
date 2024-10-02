@@ -9,6 +9,7 @@ import {
   FiCalendar,
   FiUsers,
 } from "react-icons/fi";
+import { AiOutlineProduct } from "react-icons/ai";
 
 const NavBar = ({ isMobile }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -68,7 +69,7 @@ const NavBar = ({ isMobile }) => {
                         ? "bg-gray-900 text-white"
                         : ""
                     }`}>
-                    <FiUsers className="mr-2" />
+                    <AiOutlineProduct className="mr-2" />
                     Products
                   </Link>
                   <Link
@@ -170,7 +171,7 @@ const NavBar = ({ isMobile }) => {
                   ? "bg-gray-900 text-white"
                   : "text-gray-300 hover:bg-gray-700 hover:text-white"
               }`}>
-              <FiUsers className="mr-2" />
+              <AiOutlineProduct className="mr-2" />
               Products
             </Link>
           </div>
