@@ -65,7 +65,7 @@ export const GiftcardProvider = ({ children }) => {
     try {
       const giftcardDoc = doc(db, "giftcard", id);
       const giftcardSnapshot = await getDoc(giftcardDoc);
-      console.log(newImageFile.name);
+      // console.log(newImageFile.name);
 
       let existingImageURL;
       let imageURL;

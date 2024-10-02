@@ -36,6 +36,7 @@ const GiftcardForm = ({
       } else {
         setFormData({ store: "", price: "", validity: "", ischecked: false });
         setImagePreview(null);
+        setImageFile(null);
       }
     }
   }, [editingGiftcard, isOpen]);
@@ -87,6 +88,8 @@ const GiftcardForm = ({
           ischecked: formData.ischecked,
         },imageFile);        
       }
+      setImageFile(null);
+      setImagePreview(null);
       onClose();
     } catch (error) {
       console.error("Error submitting document: ", error);
