@@ -16,7 +16,7 @@ const App = () => {
       <Router>
         <div className="App">
           <NavBar isMobile={isMobile} />
-          <div className="container mx-auto pt-16">
+          <div className="pt-16">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/promotions" element={<Promotions />} />
