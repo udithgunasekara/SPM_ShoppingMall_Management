@@ -11,9 +11,13 @@ const GiftcardForm = ({
     store: "",
     price: "",
     validity: "",
+    ischecked: false,
   });
 
-  const { giftCard,updateGiftCard,createGiftCard } = useGiftcardContext();
+  const [imageFile,setImageFile] = useState(null);
+  const [imagePreview,setImagePreview] = useState(null);
+  const { updateGiftCard,createGiftCard } = useGiftcardContext();
+  // const [sendNotification, setSendNotification] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -28,8 +32,10 @@ const GiftcardForm = ({
         };
 
         setFormData(giftcardData);
+        setImagePreview(editingGiftcard.imageURL || null);
       } else {
-        setFormData({ store: "", price: "", validity: "" });
+        setFormData({ store: "", price: "", validity: "", ischecked: false });
+        setImagePreview(null);
       }
     }
   }, [editingGiftcard, isOpen]);
@@ -38,6 +44,20 @@ const GiftcardForm = ({
     setFormData({ ...formData, [e.target.name]: e.target.value });
     console.log(e.target.value);
   };
+
+  const handleCheckboxChange = (e) => {
+    setFormData({ ...formData, ischecked: e.target.checked });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImageFile(file);
+    //create a preview 
+    if(file){
+      const previewURL = URL.createObjectURL(file);
+      setImagePreview(previewURL);
+    }
+  }
 
 
   const handleSubmit = async (e) => {
@@ -58,34 +78,15 @@ const GiftcardForm = ({
         await updateGiftCard(editingGiftcard.id, {
           ...formData,
           validity: timestamp,
-        });
-
-        const updatedGiftcards = giftCard.map((p) =>
-          p.id === editingGiftcard.id
-            ? { ...p, ...formData, validity: timestamp }
-            : p
-        );
-        // setGiftcards(updatedGiftcards);
-        // setFormData(updatedGiftcards);
+        },imageFile);        
       } else {
-        /* const docRef = await addDoc(collection(db, "giftcard"), {
-          store: formData.store,
-          price: formData.price,
-          validity: timestamp,
-        }); */
-
         await createGiftCard({
           store: formData.store,
           price: formData.price,
           validity: timestamp,
-        })
-
-        /* setGiftcards([
-          ...giftcards,
-          { ...formData, id: docRef.id, validity: timestamp },
-        ]); */
+          ischecked: formData.ischecked,
+        },imageFile);        
       }
-
       onClose();
     } catch (error) {
       console.error("Error submitting document: ", error);
@@ -166,6 +167,42 @@ const GiftcardForm = ({
               aria-label="Valid date"
               className="block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               required
+            />
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="sendNotification"
+              checked={formData.ischecked}
+              onChange={handleCheckboxChange}
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <label
+              htmlFor="sendNotification"
+              className="ml-2 block text-sm text-gray-900"
+            >
+              Send notification to loyalty point holders <br/>(once sent cannot be undone)
+            </label>
+          </div>
+
+          {/* Current Image Preview */}
+          <div className="mt-1">
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="Current Gift Card"
+                className="w-full h-auto rounded-md mb-2"
+              />
+            )}
+          </div>
+
+          {/* Image File Input */}
+          <div>
+            <input
+              type="file"
+              onChange={handleImageChange}
+              className="block w-full text-sm text-gray-700 border border-gray-300 rounded-md"
             />
           </div>
 
