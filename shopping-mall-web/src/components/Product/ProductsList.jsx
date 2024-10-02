@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import Barcode from "react-barcode"; // Import the barcode component
+import { jsPDF } from "jspdf";
 
 const ProductsList = () => {
   const [products, setProducts] = useState([]);
@@ -99,6 +100,46 @@ const ProductsList = () => {
       product.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const downloadProductList = () => {
+    const doc = new jsPDF();
+
+    // Add a title
+    doc.setFontSize(20);
+    doc.text("Product List", 14, 22);
+
+    // Add column headers
+    doc.setFontSize(12);
+    const headers = ["Title", "Brand", "Category", "Stocks"];
+    const data = filteredProducts.map((product) => [
+      product.title,
+      product.brand,
+      product.category,
+      product.stocks,
+    ]);
+
+    // Calculate the starting position for the table
+    const startY = 30;
+
+    // Draw the headers
+    headers.forEach((header, index) => {
+      doc.text(header, 14 + index * 40, startY);
+    });
+
+    // Draw the data rows
+    data.forEach((row, rowIndex) => {
+      row.forEach((cell, cellIndex) => {
+        doc.text(
+          cell.toString(),
+          14 + cellIndex * 40,
+          startY + (rowIndex + 1) * 10
+        );
+      });
+    });
+
+    // Save the PDF
+    doc.save("product-list.pdf");
+  };
+
   return (
     <div className="p-6">
       <h2 className="text-3xl font-bold mb-6">Product List</h2>
@@ -111,6 +152,15 @@ const ProductsList = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out"
           />
+          <div className="pl-96">
+            <div className="pl-64">
+              <button
+                onClick={downloadProductList}
+                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition duration-300">
+                Download Report
+              </button>
+            </div>
+          </div>
           <button
             onClick={() => navigate("/add")}
             className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition duration-300">
