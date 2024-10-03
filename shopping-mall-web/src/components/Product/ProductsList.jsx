@@ -1,5 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  ref,
+  getDocs,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import Barcode from "react-barcode"; // Import the barcode component
 import { jsPDF } from "jspdf";
@@ -140,6 +147,20 @@ const ProductsList = () => {
     doc.save("product-list.pdf");
   };
 
+  const deleteProduct = (id) => {
+    const productRef = doc(db, "Store Products", id);
+    deleteDoc(productRef)
+      .then(() => {
+        console.log("Document successfully deleted!");
+        setProducts((prevProducts) =>
+          prevProducts.filter((product) => product.id !== id)
+        );
+      })
+      .catch((error) => {
+        console.error("Error removing document: ", error);
+      });
+  };
+
   return (
     <div className="p-6">
       <h2 className="text-3xl font-bold mb-6">Product List</h2>
@@ -244,7 +265,9 @@ const ProductsList = () => {
                       className="text-blue-600 hover:text-blue-800 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 hover:bg-blue-200 transition duration-300">
                       Update
                     </button>
-                    <button className="text-red-600 hover:text-red-800 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 hover:bg-red-200 transition duration-300">
+                    <button
+                      onClick={() => deleteProduct(product.id)}
+                      className="text-red-600 hover:text-red-800 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 hover:bg-red-200 transition duration-300">
                       Delete
                     </button>
                     <button
