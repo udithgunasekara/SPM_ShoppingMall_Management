@@ -43,7 +43,7 @@ const ReadGiftcard = ({ setIsGiftcardFormOpen, handleEditGiftcard }) => {
                   onClick={() => setIsGiftcardFormOpen(true)}
                   className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition duration-300"
                 >
-                  Add New Giftcard
+                  Add New Giftcard git
                 </button>
               </div>
               <div className="overflow-x-auto">
