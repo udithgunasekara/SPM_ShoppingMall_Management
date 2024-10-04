@@ -3,11 +3,17 @@ import { useGiftcardContext } from "../../context/GiftcardContext";
 import backgroundImage from "../../assets/images/wallhaven-kxkdp7.png";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { Dialog } from '@headlessui/react';
 
 const ReadGiftcard = ({ setIsGiftcardFormOpen, handleEditGiftcard }) => {
   const { giftCard, deleteGiftCard } = useGiftcardContext();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterdata, setFilterData] = useState([]);
+
+
+  //for delete confirmation
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [giftcardToDelete, setGiftcardToDelete] = useState(null);
 
   //search function
   useEffect(() => {
@@ -70,6 +76,18 @@ const ReadGiftcard = ({ setIsGiftcardFormOpen, handleEditGiftcard }) => {
     });
 
     doc.save("giftcard_management.pdf");
+  };
+
+  const handleDeleteClick = (item) => {
+    setGiftcardToDelete(item); // Store the item to delete
+    setIsDialogOpen(true); // Open the dialog
+  };
+
+  const confirmDelete = () => {
+    if (giftcardToDelete) {
+      deleteGiftCard(giftcardToDelete.id);
+    }
+    setIsDialogOpen(false); // Close the dialog after deletion
   };
   
 
@@ -187,7 +205,7 @@ const ReadGiftcard = ({ setIsGiftcardFormOpen, handleEditGiftcard }) => {
                             Edit
                           </button>
                           <button
-                            onClick={() => deleteGiftCard(item.id)}
+                            onClick={() => handleDeleteClick(item)}
                             className="text-red-600 hover:text-white px-3 py-1 rounded-full text-sm font-semibold bg-red-300 hover:bg-red-600 transition duration-500"
                           >
                             Delete
@@ -202,6 +220,35 @@ const ReadGiftcard = ({ setIsGiftcardFormOpen, handleEditGiftcard }) => {
           </div>
         </div>
       </div>
+      {/* delete confirmation dialog */}
+      {isDialogOpen && (
+        <Dialog
+          open={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          className="fixed inset-0 z-10 flex items-center justify-center bg-gray-800 bg-opacity-75"
+        >
+          <div className="bg-white rounded-lg p-6 space-y-4">
+            <Dialog.Title className="text-lg font-bold">Delete Giftcard</Dialog.Title>
+            <Dialog.Description>
+              Are you sure you want to delete this gift card? This action cannot be undone.
+            </Dialog.Description>
+            <div className="flex space-x-4">
+              <button
+                onClick={confirmDelete}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-800 transition"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() => setIsDialogOpen(false)}
+                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-800 transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </Dialog>
+      )}
     </div>
   );
 };
