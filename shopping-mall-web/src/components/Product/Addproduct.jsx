@@ -25,7 +25,7 @@ const AddProduct = () => {
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
   const [stocks, setStocks] = useState("");
-  const [color, setColor] = useState("");
+  const [colors, setColors] = useState([]);
   const [material, setMaterial] = useState("");
 
   // Initialize Firestore and Storage
@@ -51,7 +51,7 @@ const AddProduct = () => {
           setCategory(data.category || "");
           setDescription(data.description || "");
           setStocks(data.stocks || "");
-          setColor(data.color || "");
+          setColors(data.colors || []);
           setMaterial(data.material || "");
 
           // Fetch images
@@ -96,7 +96,7 @@ const AddProduct = () => {
         description,
         images: imageUrls,
         stocks,
-        color,
+        colors,
         material,
         updatedAt: new Date(), // Add a timestamp for updates
       };
@@ -137,6 +137,17 @@ const AddProduct = () => {
       } else {
         // Add size if not selected
         return [...prevSizes, size];
+      }
+    });
+  };
+
+  // Handle color selection
+  const handleColorChange = (color) => {
+    setColors((prevColors) => {
+      if (prevColors.includes(color)) {
+        return prevColors.filter((c) => c !== color);
+      } else {
+        return [...prevColors, color];
       }
     });
   };
@@ -190,7 +201,7 @@ const AddProduct = () => {
         </div>
 
         {/* Sizes */}
-        <div className="mb-4">
+        <div className="">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Sizes
           </label>
@@ -209,9 +220,9 @@ const AddProduct = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-1">
           {/* Price */}
-          <div className="mb-4">
+          <div className="">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Price
             </label>
@@ -224,20 +235,25 @@ const AddProduct = () => {
               required
             />
           </div>
+        </div>
 
-          {/* Color */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Color
-            </label>
-            <input
-              type="text"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Enter available colors"
-              required
-            />
+        {/* Colors */}
+        <div className="">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Colors
+          </label>
+          <div className="flex justify-around space-x-4">
+            {["Red", "Blue", "Green", "Black", "White"].map((color) => (
+              <label key={color} className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={colors.includes(color)}
+                  onChange={() => handleColorChange(color)}
+                  className="form-checkbox h-5 w-5 text-blue-600 border-gray-300 rounded-md focus:ring-blue-500"
+                />
+                <span className="ml-2 text-gray-800 font-medium">{color}</span>
+              </label>
+            ))}
           </div>
         </div>
 
@@ -266,7 +282,7 @@ const AddProduct = () => {
               value={stocks}
               onChange={(e) => setStocks(e.target.value)}
               className="block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Enter stock quantity"
+              placeholder="Enter stocks"
               required
             />
           </div>
@@ -296,7 +312,7 @@ const AddProduct = () => {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className="block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Enter product category"
+              placeholder="Enter product"
               required
             />
           </div>
