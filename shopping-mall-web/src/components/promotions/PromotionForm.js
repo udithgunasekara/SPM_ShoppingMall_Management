@@ -7,9 +7,11 @@ const PromotionForm = ({ isOpen, onClose, editingPromotion }) => {
     name: '',
     discount: '',
     duration: '',
-    bannerImage: null,  // Initialize with null
+    description: '',
+    bannerImage: null,
   });
   const [imagePreview, setImagePreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (editingPromotion) {
@@ -17,13 +19,12 @@ const PromotionForm = ({ isOpen, onClose, editingPromotion }) => {
         ...editingPromotion,
       });
       if (editingPromotion.bannerImage && typeof editingPromotion.bannerImage === 'string') {
-        // Set the image URL directly if it's a string (existing image URL)
         setImagePreview(editingPromotion.bannerImage);
       } else {
         setImagePreview(null);
       }
     } else {
-      setFormData({ name: '', discount: '', duration: '', bannerImage: null });
+      setFormData({ name: '', discount: '', duration: '', description: '', bannerImage: null });
       setImagePreview(null);
     }
   }, [editingPromotion]);
@@ -33,7 +34,7 @@ const PromotionForm = ({ isOpen, onClose, editingPromotion }) => {
     if (name === 'bannerImage' && files && files[0]) {
       const file = files[0];
       setFormData({ ...formData, [name]: file });
-      setImagePreview(URL.createObjectURL(file));  // Create a URL for the image preview
+      setImagePreview(URL.createObjectURL(file));
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -41,18 +42,25 @@ const PromotionForm = ({ isOpen, onClose, editingPromotion }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const promotionData = {
       ...formData,
-      bannerImage: formData.bannerImage instanceof File ? formData.bannerImage : null, // Ensure bannerImage is a File or null
+      bannerImage: formData.bannerImage instanceof File ? formData.bannerImage : null,
     };
 
-    if (editingPromotion) {
-      await updatePromotion({ ...editingPromotion, ...promotionData });
-    } else {
-      await addPromotion(promotionData);
+    try {
+      if (editingPromotion) {
+        await updatePromotion({ ...editingPromotion, ...promotionData });
+      } else {
+        await addPromotion(promotionData);
+      }
+      onClose();
+    } catch (error) {
+      console.error("Error while saving the promotion:", error);
+    } finally {
+      setLoading(false);
     }
-    onClose();
   };
 
   if (!isOpen) return null;
@@ -111,6 +119,20 @@ const PromotionForm = ({ isOpen, onClose, editingPromotion }) => {
             />
           </div>
 
+          {/* Description */}
+          <div>
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Enter promotion description"
+              aria-label="Promotion Description"
+              className="block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              required
+            />
+          </div>
+
           {/* Banner Image */}
           <div>
             <label htmlFor="bannerImage" className="block text-sm font-medium text-gray-700 mb-1">Banner Image</label>
@@ -134,18 +156,40 @@ const PromotionForm = ({ isOpen, onClose, editingPromotion }) => {
           <div className="flex justify-between space-x-3">
             <button
               type="submit"
-              className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300 ease-in-out"
+              disabled={loading}
+              className={`w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300 ease-in-out`}
             >
-              {editingPromotion ? 'Update Promotion' : 'Create Promotion'}
+              {loading ? 'Submitting...' : (editingPromotion ? 'Update Promotion' : 'Create Promotion')}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300 ease-in-out"
+              disabled={loading}
+              className={`w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-300 ease-in-out`}
             >
               Cancel
             </button>
           </div>
+
+          {loading && (
+            <div className="flex justify-center mt-4">
+              <svg className="animate-spin h-5 w-5 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 0116 0"
+                />
+              </svg>
+            </div>
+          )}
         </form>
       </div>
     </div>

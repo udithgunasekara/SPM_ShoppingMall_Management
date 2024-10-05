@@ -7,26 +7,25 @@ const AppContext = createContext();
 export const useAppContext = () => useContext(AppContext);
 
 export const AppProvider = ({ children }) => {
-  const [promotions, setPromotions] = useState([]);
   const [events, setEvents] = useState([]);
+  const [promotions, setPromotions] = useState([]);
 
   // Fetch events from Firebase
-  useEffect(() => {
-    const fetchEvents = async () => {
-      const eventsSnapshot = await getDocs(collection(db, "events"));
-      setEvents(eventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    };
-    fetchEvents();
-  }, []);
-
-  // Fetch promotions from Firebase
-  useEffect(() => {
-    const fetchPromotions = async () => {
-      const promotionsSnapshot = await getDocs(collection(db, "promotions"));
-      setPromotions(promotionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    };
-    fetchPromotions();
-  }, []);
+  const fetchEvents = async () => {
+    try {
+      const eventsCollection = collection(db, "events");
+      const eventsSnapshot = await getDocs(eventsCollection);
+      const eventsData = eventsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setEvents(eventsData);
+      return eventsData;
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      throw error;
+    }
+  };
 
   // Add new event
   const addEvent = async (newEvent) => {
@@ -44,9 +43,12 @@ export const AppProvider = ({ children }) => {
       };
 
       const docRef = await addDoc(collection(db, "events"), eventData);
-      setEvents([...events, { ...eventData, id: docRef.id }]);
+      const newEventWithId = { ...eventData, id: docRef.id };
+      setEvents([...events, newEventWithId]);
+      return newEventWithId;
     } catch (error) {
       console.error("Error adding event: ", error);
+      throw error;
     }
   };
 
@@ -67,9 +69,11 @@ export const AppProvider = ({ children }) => {
 
       const eventRef = doc(db, "events", updatedEvent.id);
       await updateDoc(eventRef, eventData);
-      setEvents(events.map(e => e.id === updatedEvent.id ? eventData : e));
+      setEvents(events.map(e => e.id === updatedEvent.id ? { ...eventData, id: updatedEvent.id } : e));
+      return eventData;
     } catch (error) {
       console.error("Error updating event: ", error);
+      throw error;
     }
   };
 
@@ -87,8 +91,28 @@ export const AppProvider = ({ children }) => {
       setEvents(events.filter(e => e.id !== id));
     } catch (error) {
       console.error("Error deleting event: ", error);
+      throw error;
     }
   };
+
+  // Fetch promotions from Firebase
+  const fetchPromotions = async () => {
+    try {
+      const promotionsCollection = collection(db, "promotions");
+      const promotionsSnapshot = await getDocs(promotionsCollection);
+      const promotionsData = promotionsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPromotions(promotionsData);
+    } catch (error) {
+      console.error("Error fetching promotions:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPromotions();
+  }, []);
 
   // Add new promotion
   const addPromotion = async (newPromotion) => {
@@ -129,7 +153,7 @@ export const AppProvider = ({ children }) => {
 
       const promotionRef = doc(db, "promotions", updatedPromotion.id);
       await updateDoc(promotionRef, promotionData);
-      setPromotions(promotions.map(p => p.id === updatedPromotion.id ? promotionData : p));
+      setPromotions(promotions.map(p => p.id === updatedPromotion.id ? { ...promotionData, id: updatedPromotion.id } : p));
     } catch (error) {
       console.error("Error updating promotion: ", error);
     }
@@ -154,8 +178,16 @@ export const AppProvider = ({ children }) => {
 
   return (
     <AppContext.Provider value={{
-      events, addEvent, updateEvent, deleteEvent,
-      promotions, addPromotion, updatePromotion, deletePromotion
+      events,
+      fetchEvents,
+      addEvent,
+      updateEvent,
+      deleteEvent,
+      promotions,
+      fetchPromotions,
+      addPromotion,
+      updatePromotion,
+      deletePromotion,
     }}>
       {children}
     </AppContext.Provider>
